@@ -363,11 +363,11 @@ def main():
 
     # エクセルファイルに出力
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+        other_settings_kv_df.to_excel(writer, sheet_name='General Settings', index=False)
         interface_df.to_excel(writer, sheet_name='Interface Settings', index=False)
         bgp_vrf_df.to_excel(writer, sheet_name='BGP VRF Summary', index=False)
         bgp_neighbors_df.to_excel(writer, sheet_name='BGP Neighbors', index=False)
         bgp_peer_groups_df.to_excel(writer, sheet_name='BGP Peer Groups', index=False)
-        other_settings_kv_df.to_excel(writer, sheet_name='Other Settings', index=False)
 
     print(f"エクセルファイルを出力しました: {output_file}")
 
