@@ -12,7 +12,7 @@ Cumulus Linux / NVUE の YAML 形式構成を解析し、インタフェース�
   - **BGP VRF Summary**: VRF 単位の AS、Router-ID、Multipath ポリシ、ネイバー/PG 数
   - **BGP Neighbors**: VRF、Neighbor IP、Peer Group、Type、Remote AS
   - **BGP Peer Groups**: VRF、説明、Remote-AS、update-source、BFD（enable/interval/multiplier）、Multihop TTL
-  - **Other Settings**: Hostname、モデル/バージョン、グローバル BGP（Router-ID/AS）、SNMP readonly-community とアクセス許可 IP、Trap 宛先、NTP/DNS/Syslog、Bridge STP 優先度/VLAN、EVPN/Multihoming 有効化
+  - **General Settings**: Hostname、モデル/バージョン、グローバル BGP（Router-ID/AS）、SNMP readonly-community とアクセス許可 IP、Trap 宛先、NTP/DNS/Syslog、Bridge STP 優先度/VLAN、EVPN/Multihoming 有効化
 - **ホスト名を自動検出** し、出力ファイル名に反映
 - Excel へ **複数シート** で出力（`openpyxl`）
 
@@ -43,7 +43,7 @@ python cumulus_config_sheet_creator.py /path/to/running-config.yaml
   - 全 VRF のネイバー一覧と属性。
 - **BGP Peer Groups**
   - 全 VRF のピアグループ一覧と詳細（BFD/TTL/US 等）。
-- **Other Settings**
+- **General Settings**
   - Hostname、Model、Version、グローバル BGP（`set.router.bgp`）の Router-ID/AS、SNMP（readonly-community とアクセス IP、Trap 宛先）、NTP/DNS/Syslog、Bridge STP Priority/VLAN、EVPN 有効化など。
 
 ## データ項目の定義
@@ -69,7 +69,7 @@ python cumulus_config_sheet_creator.py /path/to/running-config.yaml
 - NVUE `vrf.<name>.router.bgp` 配下を解析し、VRF 単位で要約化/正規化して出力。
 - Multipath の要約は `path-selection.multipath.aspath-ignore` を `aspath-ignore: on|off` 形式で記載。
 
-### Other Settings
+### General Settings
 - `header.model` / `header.version`
 - `set.system.hostname`
 - `set.router.bgp.router-id` / `autonomous-system`
@@ -84,10 +84,3 @@ python cumulus_config_sheet_creator.py /path/to/running-config.yaml
 - **Bridge/STP の抽出**: `bridge.domain` が複数ある場合、各 IF に最初のドメインの属性を割当てています。必要に応じて *IF×Domain* の正規化に拡張してください。
 - **SNMP Trap**: `community-password` キーは実体としてコミュニティ名を採っています（命名が紛らわしい点に留意）。秘匿情報の扱いには十分注意してください。
 - **アドレスファミリ**: `address-family` の詳細（例えば `l2vpn-evpn` の redistribute/export ルール等）は現状要約のみ。列挙を追加する場合は `create_bgp_vrf_dataframe()` の拡張が必要です。
-
-## 拡張のヒント
-- **VLAN/VRF/IF の整合チェック**: VLAN 存在確認、IF⇔VRF の紐付け検証、未使用 VLAN の抽出などの QA ルールを追加。
-- **EVPN MH 詳細**: `evpn.multihoming.*`（ESI/LACP mode/MH timer）や `nv show evpn multihoming` の出力を別シート化。
-- **BGP AFI/SAFI 詳細**: `address-family.l2vpn-evpn`／`ipv4-unicast` の `redistribute` 等を表展開。
-- **ACL/CoPP/Route-Map**: `policy.*` を解析して別シートに展開。
-- **単体テスト**: サンプル YAML を fixtures 化し、`pytest` で関数別に検証。
